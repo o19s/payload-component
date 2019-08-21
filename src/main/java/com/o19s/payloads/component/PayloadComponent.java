@@ -8,16 +8,21 @@ import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.core.PluginInfo;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
+import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.handler.component.ShardResponse;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.QParserPlugin;
 import org.apache.solr.search.SyntaxError;
+import org.apache.solr.util.SolrPluginUtils;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.apache.solr.util.plugin.SolrCoreAware;
 
+import javax.xml.ws.Response;
 import java.io.IOException;
 import java.util.List;
 
@@ -90,8 +95,14 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
                 payloadFields = params.getParams(CommonParams.DF);
             }
 
+            // If the query isn't null, lets load some payloads
             if (payloadQuery != null) {
-                NamedList payloadData = payloader.getPayloads();
+                NamedList payloadData = payloader.getPayloads(
+                        responseBuilder.getResults().docList,
+                        payloadQuery,
+                        responseBuilder.req,
+                        payloadFields
+                );
 
                 if (payloadData != null) {
                     responseBuilder.rsp.add(PayloadParams.NAME, payloadData);
@@ -103,7 +114,29 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
 
     @Override
     public void finishStage(ResponseBuilder responseBuilder) {
+        SolrParams params = responseBuilder.req.getParams();
 
+        if (payloadsEnabled(params) && responseBuilder.stage == ResponseBuilder.STAGE_GET_FIELDS) {
+
+            NamedList.NamedListEntry[] arr = new NamedList.NamedListEntry[responseBuilder.resultIds.size()];
+
+            // TODO: make a generic routine to do automatic merging of id keyed data
+            for (ShardRequest sreq : responseBuilder.finished) {
+                if ((sreq.purpose & ShardRequest.PURPOSE_GET_HIGHLIGHTS) == 0) continue;
+                for (ShardResponse srsp : sreq.responses) {
+                    if (srsp.getException() != null) {
+                        // can't expect the highlight content if there was an exception for this request
+                        // this should only happen when using shards.tolerant=true
+                        continue;
+                    }
+                    NamedList hl = (NamedList)srsp.getSolrResponse().getResponse().get(PayloadParams.NAME);
+                    SolrPluginUtils.copyNamedListIntoArrayByDocPosInResponse(hl, responseBuilder.resultIds, arr);
+                }
+            }
+
+            // remove nulls in case not all docs were able to be retrieved
+            responseBuilder.rsp.add(PayloadParams.NAME, SolrPluginUtils.removeNulls(arr, new SimpleOrderedMap<>()));
+        }
     }
 
     @Override
@@ -127,8 +160,28 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
 
     }
 
+    @Override
+    public void modifyRequest(ResponseBuilder responseBuilder, SearchComponent who, ShardRequest shardRequest) {
+        SolrParams params = responseBuilder.req.getParams();
+        if (!payloadsEnabled(params)) return;
+
+        // Turn on highlighting only only when retrieving fields
+        // TODO: Verify this works as expected and doesn't step on highlighter component feet
+        if ((shardRequest.purpose & ShardRequest.PURPOSE_GET_FIELDS) != 0) {
+            shardRequest.purpose |= ShardRequest.PURPOSE_GET_HIGHLIGHTS;
+            // should already be true...
+            shardRequest.params.set(PayloadParams.PL, "true");
+        } else {
+            shardRequest.params.set(PayloadParams.PL, "false");
+        }
+    }
+
+    @Override
+    public void handleResponses(ResponseBuilder responseBuilder, ShardRequest shardRequest){
+        // No-op
+    }
+
     private boolean payloadsEnabled(SolrParams params) {
-        // TODO: Parse from pl=on
-        return true;
+        return params.getBool(PayloadParams.PL, false);
     }
 }
