@@ -6,7 +6,4 @@ public interface PayloadParams {
 
     // Set pl to on/true to enable the payload component
     public static final String PL = "pl";
-
-    // pl.q is used internally inside prepare/process to setup the query
-    public static final String PLQ = "pl.q";
 }
