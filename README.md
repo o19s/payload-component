@@ -6,7 +6,7 @@ Example document:
 ```
 {
   "id": "my sample doc",
-  "payload_content": "Look|ignored at these payloads|wow"
+  "payload_content": "Look|ignored at this|wow"
 }
 ```
 
