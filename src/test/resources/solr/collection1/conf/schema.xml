@@ -7,7 +7,7 @@
     -->
 
     <field name="id" type="string" indexed="true"  stored="true"  multiValued="false" />
-    <field name="content_ocr" type="ocr" indexed="true"  stored="true"  multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
+    <field name="content_payload" type="payload" indexed="true"  stored="true"  multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
 
     <!--
         Copy fields
@@ -24,17 +24,11 @@
     <!-- field to use to determine and enforce document uniqueness. -->
     <uniqueKey>id</uniqueKey>
 
-    <!-- field for the QueryParser to use when an explicit fieldname is absent -->
-    <defaultSearchField>content_ocr</defaultSearchField>
-
-    <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
-    <solrQueryParser defaultOperator="OR"/>
-
     <!--
         Field Types
     -->
-    <!-- OCR Payloads -->
-    <fieldType name="ocr" stored="false" indexed="true" class="solr.TextField">
+    <!-- Delimited Payloads -->
+    <fieldType name="payload" stored="false" indexed="true" class="solr.TextField">
       <analyzer>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="identity" />

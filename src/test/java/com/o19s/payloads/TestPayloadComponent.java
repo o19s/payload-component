@@ -26,7 +26,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
     @Test
     public void testPayloads() {
         // Add a sample doc
-        assertU(adoc("content_ocr", "Quick|testpayload brown fox",
+        assertU(adoc("content_payload", "Quick|testpayload brown fox",
                 "id", "1"));
         assertU(commit());
         assertU(optimize());

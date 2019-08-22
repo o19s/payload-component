@@ -41,7 +41,7 @@ public class Payloader implements PluginInfoInitialized {
 
         SolrIndexSearcher searcher = request.getSearcher();
         IndexSchema schema = searcher.getSchema();
-        IndexReader reader = new TermVectorReusingLeafReader(request.getSearcher().getLeafReader());
+        IndexReader reader = new TermVectorReusingLeafReader(request.getSearcher().getSlowAtomicReader());
 
 
         SchemaField keyField = schema.getUniqueKeyField();
@@ -155,6 +155,16 @@ public class Payloader implements PluginInfoInitialized {
                 tvFields = in.getTermVectors(docID);
             }
             return tvFields;
+        }
+
+        @Override
+        public CacheHelper getCoreCacheHelper() {
+            return null;
+        }
+
+        @Override
+        public CacheHelper getReaderCacheHelper() {
+            return null;
         }
     }
 }
