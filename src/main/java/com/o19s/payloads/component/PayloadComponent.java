@@ -5,7 +5,6 @@ import com.o19s.payloads.params.PayloadParams;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CommonParams;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -22,7 +21,6 @@ import org.apache.solr.util.SolrPluginUtils;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.apache.solr.util.plugin.SolrCoreAware;
 
-import javax.xml.ws.Response;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,9 +33,9 @@ import java.util.List;
     {
         ....SOLR RESPONSE....
         "payloads" : {
-            "one cool doc": {
-                "quick": [
-                    "123 123 123 123",
+            "one cool doc": {           // Doc ID
+                "quick": [              // Term
+                    "123 123 123 123",  // Payloads associated with the term
                     "123 123 123 123"
                 ],
                 "fox": [
@@ -79,7 +77,6 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
             // Parse the query if possible
             if (plQ != null) {
                 try {
-                    ModifiableSolrParams modParams = new ModifiableSolrParams(params);
                     QParser parser = QParser.getParser(plQ, parserType, responseBuilder.req);
                     payloadQuery = parser.getQuery();
                 } catch (SyntaxError e) {
@@ -108,7 +105,6 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
                     responseBuilder.rsp.add(PayloadParams.NAME, payloadData);
                 }
             }
-
         }
     }
 
@@ -144,8 +140,6 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
         return PayloadParams.NAME;
     }
 
-
-
     @Override
     public void inform(SolrCore core) {
         List<PluginInfo> children = info.getChildren(PayloadParams.NAME);
@@ -153,7 +147,6 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
             Payloader defPayloader = new Payloader(core);
             defPayloader.init(PluginInfo.EMPTY_INFO);
             payloader = defPayloader;
-
         } else {
             payloader = core.createInitInstance(children.get(0),Payloader.class,null, Payloader.class.getName());
         }
@@ -165,7 +158,7 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
         SolrParams params = responseBuilder.req.getParams();
         if (!payloadsEnabled(params)) return;
 
-        // Turn on highlighting only only when retrieving fields
+        // Turn on highlighting only when retrieving fields
         // TODO: Verify this works as expected and doesn't step on highlighter component feet
         if ((shardRequest.purpose & ShardRequest.PURPOSE_GET_FIELDS) != 0) {
             shardRequest.purpose |= ShardRequest.PURPOSE_GET_HIGHLIGHTS;

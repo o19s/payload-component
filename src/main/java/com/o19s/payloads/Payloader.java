@@ -22,7 +22,6 @@ import org.apache.solr.search.SolrIndexSearcher;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +105,7 @@ public class Payloader implements PluginInfoInitialized {
             closeStream(stream);
         }
 
+        // TODO: Multivalued fields won't work with this impl, need to get all fields for name and loop
         IndexableField myField = doc.getField(field.getName());
         String data = myField.stringValue();
         TokenStream stream = field.getType().getIndexAnalyzer().tokenStream(field.getName(), data);
