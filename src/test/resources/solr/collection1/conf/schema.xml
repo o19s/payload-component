@@ -8,6 +8,7 @@
 
     <field name="id" type="string" indexed="true"  stored="true"  multiValued="false" />
     <field name="content_payload" type="payload" indexed="true"  stored="true"  multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
+    <field name="content_payload_b64" type="payload_b64" indexed="true" stored="true" multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
 
     <!--
         Copy fields
@@ -35,6 +36,16 @@
         <filter class="solr.WordDelimiterFilterFactory" />
         <filter class="solr.LowerCaseFilterFactory" />
       </analyzer>
+    </fieldType>
+
+    <!-- Delimited Payloads with Base64 decoding -->
+    <fieldType name="payload_b64" stored="false" indexed="true" class="solr.TextField">
+        <analyzer>
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="com.o19s.payloads.Base64Encoder" />
+            <filter class="solr.WordDelimiterFilterFactory" />
+            <filter class="solr.LowerCaseFilterFactory" />
+        </analyzer>
     </fieldType>
 
     <!-- Simple text analysis -->

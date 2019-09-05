@@ -40,4 +40,23 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
                 sumLRF.makeRequest("quick"),
                 "//arr[@name='quick']/str[.='testpayload']");
     }
+
+    @Test
+    public void testBase64Encoder() {
+        // Add a sample doc
+        assertU(adoc("content_payload_b64", "Quick|SSBsb3ZlIHBheWxvYWRzIQ== brown fox",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("df", "content_payload_b64");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify payload component functionality",
+                sumLRF.makeRequest("quick"),
+                "//arr[@name='quick']/str[.='I love payloads!']");
+    }
 }
