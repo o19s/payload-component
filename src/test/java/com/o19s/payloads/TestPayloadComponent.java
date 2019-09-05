@@ -59,4 +59,53 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
                 sumLRF.makeRequest("quick"),
                 "//arr[@name='quick']/str[.='I love payloads!']");
     }
+
+    /**
+     * As of Solr 7.1 the WDF strips payloads if a token contains any punctuation.
+     * This test verifies that behavior and when it stops working it hopefully means the issue is resolved in Solr!
+     */
+    @Test
+    public void testPayloadStrip() {
+        // Add a sample doc
+        assertU(adoc("content_payload", "Quick-stunning|testpayload brown fox",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify payload component functionality",
+                sumLRF.makeRequest("quick stunning"),
+                "not(//lst[@name='content_payload']/node())");
+    }
+
+    /**
+     * This test is the same as testPayloadStrip but it uses this plugins PayloadBufferFilter.
+     *
+     * The expected behavior is to see the payload remain.
+     */
+    @Test
+    public void testPayloadBuffer() {
+        // Add a sample doc
+        assertU(adoc("content_payload_buffered", "Quick-stunning|testpayload brown|next fox",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("df", "content_payload_buffered");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify payload component functionality",
+                sumLRF.makeRequest("quick stunning brown fox"),
+                "//arr[@name='quick']/str[.='testpayload']",
+                "//arr[@name='stunning']/str[.='testpayload']",
+                "//arr[@name='brown']/str[.='next']",
+                "//arr[@name='fox']/str[.='']");
+    }
 }
