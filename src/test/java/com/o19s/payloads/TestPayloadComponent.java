@@ -55,7 +55,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
 
-        assertQ("Verify payload component functionality",
+        assertQ("Verify Base64 payload is decoded correctly",
                 sumLRF.makeRequest("quick"),
                 "//arr[@name='quick']/str[.='I love payloads!']");
     }
