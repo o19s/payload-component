@@ -9,7 +9,7 @@
     <field name="id" type="string" indexed="true"  stored="true"  multiValued="false" />
     <field name="content_payload" type="payload" indexed="true"  stored="true"  multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
     <field name="content_payload_b64" type="payload_b64" indexed="true" stored="true" multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
-    <field name="content_payload_buffered" type="payload_buffered" indexed="true" stored="true" multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
+    <field name="content_payload_buffered" type="payload_buffered" indexed="true" stored="true" multiValued="true" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
 
     <!--
         Copy fields

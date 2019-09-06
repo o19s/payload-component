@@ -138,6 +138,30 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
     }
 
     @Test
+    public void testMultivaluedSupport() {
+        // Add a sample doc
+        assertU(adoc("content_payload_buffered", "one|one",
+                "content_payload_buffered", "one|two",
+                "content_payload_buffered", "one|three",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("df", "content_payload_buffered");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Testing multivalued support",
+                sumLRF.makeRequest("one"),
+                "//arr[@name='one']/str[.='one']",
+                "//arr[@name='one']/str[.='two']",
+                "//arr[@name='one']/str[.='three']");
+    }
+
+
+    @Test
     public void testPunctuation() {
         // Add a sample doc
         assertU(adoc("content_payload_buffered", "Apostrophe's,|apo period.|period comma,|comma junk",

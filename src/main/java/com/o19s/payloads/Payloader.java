@@ -106,26 +106,28 @@ public class Payloader implements PluginInfoInitialized {
         }
 
         // TODO: Multivalued fields won't work with this impl, need to get all fields for name and loop
-        IndexableField myField = doc.getField(field.getName());
-        String data = myField.stringValue();
-        TokenStream stream = field.getType().getIndexAnalyzer().tokenStream(field.getName(), data);
-        CharTermAttribute charAtt = stream.addAttribute(CharTermAttribute.class);
-        PayloadAttribute payloadAtt = stream.addAttribute(PayloadAttribute.class);
+        IndexableField[] fields = doc.getFields(field.getName());
+        for (IndexableField currentField : fields) {
+            String data = currentField.stringValue();
+            TokenStream stream = field.getType().getIndexAnalyzer().tokenStream(field.getName(), data);
+            CharTermAttribute charAtt = stream.addAttribute(CharTermAttribute.class);
+            PayloadAttribute payloadAtt = stream.addAttribute(PayloadAttribute.class);
 
-        stream.reset();
-        for (boolean next = stream.incrementToken(); next; next = stream.incrementToken()) {
-            String token = charAtt.toString();
-            if (targetTerms.contains(token) && payloadAtt.getPayload() != null) {
-                // Make key in map if it doesn't exist yet
-                if (resp.get(token) == null) {
-                    resp.add(token, new ArrayList<String>());
+            stream.reset();
+            for (boolean next = stream.incrementToken(); next; next = stream.incrementToken()) {
+                String token = charAtt.toString();
+                if (targetTerms.contains(token) && payloadAtt.getPayload() != null) {
+                    // Make key in map if it doesn't exist yet
+                    if (resp.get(token) == null) {
+                        resp.add(token, new ArrayList<String>());
+                    }
+
+                    List<String> payloadList = (List) resp.get(token);
+                    payloadList.add(payloadAtt.getPayload().utf8ToString());
                 }
-
-                List<String> payloadList = (List) resp.get(token);
-                payloadList.add(payloadAtt.getPayload().utf8ToString());
             }
+            closeStream(stream);
         }
-        closeStream(stream);
 
         return resp;
     }
