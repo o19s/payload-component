@@ -28,6 +28,11 @@ public class PayloadBufferAttributeImpl extends AttributeImpl implements Payload
         // No-op to maintain data even if other filters call clear
     }
 
+    public void forceClear() {
+        // PayloadBufferFilter will call force clear when offsets move
+        this.payload = null;
+    }
+
     @Override
     public PayloadBufferAttributeImpl clone() {
         PayloadBufferAttributeImpl clone = (PayloadBufferAttributeImpl) super.clone();

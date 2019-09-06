@@ -85,7 +85,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
     /**
      * This test is the same as testPayloadStrip but it uses this plugins PayloadBufferFilter.
      *
-     * The expected behavior is to see the payload remain.
+     * The expected behavior is to see the payloads remain even if the WDF splits tokens up.
      */
     @Test
     public void testPayloadBuffer() {
@@ -101,11 +101,16 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
 
+        /**
+         * testpayload should be applied to quick & stunning as they're part of the same token before the WDF
+         * next should be applied to brown
+         * fox should have no payload
+         */
         assertQ("Verify payload component functionality",
                 sumLRF.makeRequest("quick stunning brown fox"),
                 "//arr[@name='quick']/str[.='testpayload']",
                 "//arr[@name='stunning']/str[.='testpayload']",
                 "//arr[@name='brown']/str[.='next']",
-                "//arr[@name='fox']/str[.='']");
+                "not(//arr[@name='fox'])");
     }
 }
