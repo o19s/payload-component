@@ -22,8 +22,6 @@ import java.io.IOException;
  * filter is one option but cleaning data of punctuation during indexing is another.
  */
 public class PayloadBufferFilter extends TokenFilter {
-    private int lastStartOffset = 0;
-
     private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
     private final PayloadAttribute payloadAtt = addAttribute(PayloadAttribute.class);
     private final PayloadBufferAttribute bufferAtt = addAttribute(PayloadBufferAttribute.class);
@@ -34,30 +32,35 @@ public class PayloadBufferFilter extends TokenFilter {
 
     @Override
     public final boolean incrementToken() throws IOException {
-        if(!input.incrementToken()) {
+        if (!input.incrementToken()) {
             return false;
         }
 
-        // Force clear the buffer when offsets shift
-        if (offsetAtt.startOffset() != lastStartOffset) {
-            bufferAtt.forceClear();
-            lastStartOffset = offsetAtt.startOffset();
-        }
-
         // If the buffer has data apply it to the payloadAtt if it is empty
-        if (bufferAtt.getPayload() != null && payloadAtt.getPayload() == null) {
+        if (bufferAtt.getPayload() != null && payloadAtt.getPayload() == null && checkBuffer()) {
             payloadAtt.setPayload(BytesRef.deepCopyOf(bufferAtt.getPayload()));
         // Otherwise check if theres a payload, if so, copy it to the buffer
         } else if (payloadAtt.getPayload() != null) {
             bufferAtt.setPayload(BytesRef.deepCopyOf(payloadAtt.getPayload()));
+            bufferAtt.setEndOffset(offsetAtt.endOffset());
         }
 
         return true;
     }
 
-    @Override
-    public void reset() throws IOException {
-        super.reset();
-        lastStartOffset = 0;
+    /**
+     * If the current offset is higher than the buffer offset the bufferAtt is force cleared.
+     *
+     * The current behavior applies a payload to all tokens produced by the WDF.
+     *
+     * @return True if the buffer is still in acceptable range, false otherwise
+     */
+    private boolean checkBuffer() {
+        if (offsetAtt.startOffset() > bufferAtt.getEndOffset()) {
+            bufferAtt.forceClear();
+            return false;
+        }
+
+        return true;
     }
 }

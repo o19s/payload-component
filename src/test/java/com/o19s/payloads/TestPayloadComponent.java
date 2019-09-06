@@ -77,7 +77,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
 
-        assertQ("Verify payload component functionality",
+        assertQ("Verify existence of WDF stripping payloads",
                 sumLRF.makeRequest("quick stunning"),
                 "not(//lst[@name='content_payload']/node())");
     }
@@ -106,11 +106,33 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
          * next should be applied to brown
          * fox should have no payload
          */
-        assertQ("Verify payload component functionality",
+        assertQ("Verify buffer filter logic",
                 sumLRF.makeRequest("quick stunning brown fox"),
                 "//arr[@name='quick']/str[.='testpayload']",
                 "//arr[@name='stunning']/str[.='testpayload']",
                 "//arr[@name='brown']/str[.='next']",
                 "not(//arr[@name='fox'])");
+    }
+
+    @Test
+    public void testPunctuation() {
+        // Add a sample doc
+        assertU(adoc("content_payload_buffered", "Apostrophe's,|apo period.|period comma,|comma junk",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("df", "content_payload_buffered");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Testing punctuation cases",
+                sumLRF.makeRequest("apostrophe's period. comma, junk"),
+                "//arr[@name='apostrophe']/str[.='apo']",
+                "//arr[@name='period']/str[.='period']",
+                "//arr[@name='comma']/str[.='comma']",
+                "not(//arr[@name='junk'])");
     }
 }

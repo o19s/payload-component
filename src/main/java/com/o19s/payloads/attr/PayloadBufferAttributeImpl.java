@@ -6,11 +6,22 @@ import org.apache.lucene.util.BytesRef;
 
 public class PayloadBufferAttributeImpl extends AttributeImpl implements PayloadBufferAttribute, Cloneable {
     private BytesRef payload;
+    private int endOffset;
 
     public PayloadBufferAttributeImpl() {}
 
     public PayloadBufferAttributeImpl(BytesRef payload) {
         this.payload = payload;
+    }
+
+    @Override
+    public int getEndOffset() {
+        return endOffset;
+    }
+
+    @Override
+    public void setEndOffset(int endOffset) {
+        this.endOffset = endOffset;
     }
 
     @Override
@@ -31,6 +42,7 @@ public class PayloadBufferAttributeImpl extends AttributeImpl implements Payload
     public void forceClear() {
         // PayloadBufferFilter will call force clear when offsets move
         this.payload = null;
+        this.endOffset = 0;
     }
 
     @Override
@@ -38,6 +50,7 @@ public class PayloadBufferAttributeImpl extends AttributeImpl implements Payload
         PayloadBufferAttributeImpl clone = (PayloadBufferAttributeImpl) super.clone();
         if (payload != null) {
             clone.payload = BytesRef.deepCopyOf(payload);
+            clone.endOffset = endOffset;
         }
 
         return clone;
@@ -63,17 +76,19 @@ public class PayloadBufferAttributeImpl extends AttributeImpl implements Payload
 
     @Override
     public int hashCode() {
-        return (payload == null) ? 0 : payload.hashCode();
+        return (payload == null) ? 0 : payload.hashCode() + endOffset;
     }
 
     @Override
     public void copyTo(AttributeImpl target) {
         PayloadBufferAttribute t = (PayloadBufferAttribute) target;
         t.setPayload((payload == null) ? null : BytesRef.deepCopyOf(payload));
+        t.setEndOffset(endOffset);
     }
 
     @Override
     public void reflectWith(AttributeReflector reflector) {
         reflector.reflect(PayloadBufferAttribute.class, "payload", payload);
+        reflector.reflect(PayloadBufferAttribute.class, "endOffset", endOffset);
     }
 }
