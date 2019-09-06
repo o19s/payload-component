@@ -90,7 +90,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
     @Test
     public void testPayloadBuffer() {
         // Add a sample doc
-        assertU(adoc("content_payload_buffered", "Quick-stunning|testpayload brown|next fox",
+        assertU(adoc("content_payload_buffered", "Quick-stunning|testpayload amazing,small|second brown|next fox",
                 "id", "1"));
         assertU(commit());
         assertU(optimize());
@@ -107,11 +107,34 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
          * fox should have no payload
          */
         assertQ("Verify buffer filter logic",
-                sumLRF.makeRequest("quick stunning brown fox"),
+                sumLRF.makeRequest("quick stunning amazing small brown fox"),
                 "//arr[@name='quick']/str[.='testpayload']",
                 "//arr[@name='stunning']/str[.='testpayload']",
+                "//arr[@name='amazing']/str[.='second']",
+                "//arr[@name='small']/str[.='second']",
                 "//arr[@name='brown']/str[.='next']",
                 "not(//arr[@name='fox'])");
+    }
+
+    @Test
+    public void testMultipleHits() {
+        // Add a sample doc
+        assertU(adoc("content_payload_buffered", "one|one one|two one|three",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("df", "content_payload_buffered");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Testing multiple hits on single token",
+                sumLRF.makeRequest("one"),
+                "//arr[@name='one']/str[.='one']",
+                "//arr[@name='one']/str[.='two']",
+                "//arr[@name='one']/str[.='three']");
     }
 
     @Test
