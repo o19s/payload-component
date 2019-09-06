@@ -105,7 +105,6 @@ public class Payloader implements PluginInfoInitialized {
             closeStream(stream);
         }
 
-        // TODO: Multivalued fields won't work with this impl, need to get all fields for name and loop
         IndexableField[] fields = doc.getFields(field.getName());
         for (IndexableField currentField : fields) {
             String data = currentField.stringValue();
