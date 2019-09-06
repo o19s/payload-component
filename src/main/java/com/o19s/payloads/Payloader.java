@@ -41,7 +41,7 @@ public class Payloader implements PluginInfoInitialized {
 
         SolrIndexSearcher searcher = request.getSearcher();
         IndexSchema schema = searcher.getSchema();
-        IndexReader reader = new TermVectorReusingLeafReader(request.getSearcher().getSlowAtomicReader());
+        IndexReader reader = request.getSearcher().getSlowAtomicReader();
 
 
         SchemaField keyField = schema.getUniqueKeyField();
@@ -50,8 +50,6 @@ public class Payloader implements PluginInfoInitialized {
         }
 
         String[] fieldnames = getPayloadFields(query, request, fields);
-        // --- prefetch code --- Not sure we need it
-        // --- fast vector wrapper? --
 
         NamedList payloads = new SimpleOrderedMap();
         DocIterator iterator = docs.iterator();
@@ -136,36 +134,6 @@ public class Payloader implements PluginInfoInitialized {
         if (stream != null) {
             stream.end();
             stream.close();
-        }
-    }
-
-    // Brought over from the DefaultSolrHighlighter
-    class TermVectorReusingLeafReader extends FilterLeafReader {
-
-        private int lastDocId = -1;
-        private Fields tvFields;
-
-        public TermVectorReusingLeafReader(LeafReader in) {
-            super(in);
-        }
-
-        @Override
-        public Fields getTermVectors(int docID) throws IOException {
-            if (docID != lastDocId) {
-                lastDocId = docID;
-                tvFields = in.getTermVectors(docID);
-            }
-            return tvFields;
-        }
-
-        @Override
-        public CacheHelper getCoreCacheHelper() {
-            return null;
-        }
-
-        @Override
-        public CacheHelper getReaderCacheHelper() {
-            return null;
         }
     }
 }
