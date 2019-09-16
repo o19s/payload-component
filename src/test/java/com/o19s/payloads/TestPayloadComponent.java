@@ -197,6 +197,24 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
     }
 
     @Test
+    public void testPhraseExtra() {
+        // Add a sample doc
+        assertU(adoc("content_payload", "Quick brown fox quick|extra",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify phrase tokens don't match outside quote",
+                sumLRF.makeRequest("\"quick brown\""),
+                "not(//arr[@name='quick']/str[.='extra'])");
+    }
+
+    @Test
     public void testPunctuation() {
         // Add a sample doc
         assertU(adoc("content_payload_buffered", "Apostrophe's,|apo period.|period comma,|comma junk",
