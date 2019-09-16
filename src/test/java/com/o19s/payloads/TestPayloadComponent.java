@@ -160,6 +160,41 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
                 "//arr[@name='one']/str[.='three']");
     }
 
+    @Test
+    public void testPhraseMatch() {
+        // Add a sample doc
+        assertU(adoc("content_payload", "Quick|testpayload brown fox",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify payload phrase match",
+                sumLRF.makeRequest("\"quick brown\""),
+                "//arr[@name='quick']/str[.='testpayload']");
+    }
+
+    @Test
+    public void testPhraseNoMatch() {
+        // Add a sample doc
+        assertU(adoc("content_payload", "Quick|testpayload brown fox",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify phrase error doesn't match",
+                sumLRF.makeRequest("brown \"quick fox\""),
+                "not(//arr[@name='quick']/str[.='testpayload'])");
+    }
 
     @Test
     public void testPunctuation() {
