@@ -39,7 +39,7 @@ Since `wow` was a payload of the `this` token, and `this` was in the query, `wow
 This project was originally conceived as a solution for storing bounding boxes with terms for OCR highlighting.
 
 ## Requirements
-- Solr 7.1
+- Solr 7.x
 - A field type that utilizes payloads
 
 ## Usage
