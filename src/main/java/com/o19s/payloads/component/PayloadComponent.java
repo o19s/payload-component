@@ -16,6 +16,7 @@ import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.QParserPlugin;
+import org.apache.solr.search.QueryParsing;
 import org.apache.solr.search.SyntaxError;
 import org.apache.solr.util.SolrPluginUtils;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
@@ -72,7 +73,7 @@ public class PayloadComponent extends SearchComponent implements PluginInfoIniti
             // TODO: Maybe support pl.q in the future, using the main query for now
             // Read in query, utilize a lucene query type
             String plQ = params.get(CommonParams.Q);
-            String parserType = QParserPlugin.DEFAULT_QTYPE;
+            String parserType = params.get(QueryParsing.DEFTYPE, QParserPlugin.DEFAULT_QTYPE);
 
             // Parse the query if possible
             if (plQ != null) {

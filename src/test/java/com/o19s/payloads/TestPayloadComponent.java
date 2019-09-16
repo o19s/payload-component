@@ -215,6 +215,28 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
     }
 
     @Test
+    public void testPhraseSlop() {
+        // Add a sample doc
+        assertU(adoc("content_payload", "Quick|one brown|extra fox|two",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("defType", "edismax");
+        args.put("qf", "content_payload");
+        args.put("qs", "1");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("", 0, 200, args);
+
+        assertQ("Verify slop works",
+                sumLRF.makeRequest("\"quick fox\""),
+                "//arr[@name='quick']/str[.='one']",
+                "//arr[@name='fox']/str[.='two']");
+    }
+
+    @Test
     public void testPunctuation() {
         // Add a sample doc
         assertU(adoc("content_payload_buffered", "Apostrophe's,|apo period.|period comma,|comma junk",

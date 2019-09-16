@@ -90,7 +90,7 @@ public class Payloader implements PluginInfoInitialized {
             String data = currentField.stringValue();
 
             WeightedSpanHelper wsh = new WeightedSpanHelper();
-            TokenStream queryStream = field.getType().getQueryAnalyzer().tokenStream(field.getName(), data);
+            TokenStream queryStream = field.getType().getIndexAnalyzer().tokenStream(field.getName(), data);
             Map<String, WeightedSpanTerm> spanTerms = wsh.getWeightedSpanTerms(query, 1f, queryStream);
 
             TokenStream stream = field.getType().getIndexAnalyzer().tokenStream(field.getName(), data);
@@ -101,7 +101,7 @@ public class Payloader implements PluginInfoInitialized {
 
             stream.reset();
 
-            int position = 0;
+            int position = -1;
             WeightedSpanTerm weightedSpanTerm = null;
 
             for (boolean next = stream.incrementToken(); next; next = stream.incrementToken()) {
