@@ -9,7 +9,7 @@
   <version>1.0.2-solr7.1.0-SNAPSHOT</version>
 
   <name>solr-payloads</name>
-  <url>https://github.com/worleydl/payload-formatter</url>
+  <url>https://github.com/o19s/payload-component</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
