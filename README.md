@@ -45,7 +45,8 @@ This project was originally conceived as a solution for storing bounding boxes w
 ## Usage
 - Add the payload component to the last-components section of your search handler
 - Configure a field type that utilizes payloads
-- Pass pl=on in your query params for queries in which you want to extract payload matches
+- Pass `pl=on` in your query params for queries in which you want to extract payload matches
+- To learn how to configure you Solr review the test `schema.xml` and `solrconfig.xml` at https://github.com/o19s/payload-component/tree/master/src/test/resources/solr/collection1/conf
 
 ## Building
 Building requires JDK 8 and Maven.  Once you're setup just run:
