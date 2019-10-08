@@ -34,8 +34,12 @@ public class Base64Encoder  extends AbstractEncoder implements PayloadEncoder {
         final ByteBuffer bb = charset.encode(CharBuffer.wrap(buffer, offset, length));
 
         BytesRef encoded = new BytesRef(bb.array(), bb.arrayOffset() + bb.position(), bb.remaining());
-        String decoded = new String(Base64.getMimeDecoder().decode(encoded.bytes), charset);
 
-        return new BytesRef(decoded.getBytes());
+        try {
+            String decoded = new String(Base64.getMimeDecoder().decode(encoded.bytes), charset);
+            return new BytesRef(decoded.getBytes());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Unable to decode Base64 payload.  This can occur if the payload is malformed or if the content included the delimiter by mistake.");
+        }
     }
 }
