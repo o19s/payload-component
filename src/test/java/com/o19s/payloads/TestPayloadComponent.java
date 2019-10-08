@@ -257,4 +257,25 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
                 "//arr[@name='comma']/str[.='comma']",
                 "not(//arr[@name='junk'])");
     }
+    
+    @Test
+    public void testBase64EncodingWithPipeDelimiterThrows4ByteEndingError() {
+        // Add a sample doc
+        assertU(adoc("content_payload_b64", "|mportantly|OSAyMDAgMTM1MiAyOTYgMTM3MA==",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("df", "content_payload_b64");
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify Base64 payload is decoded correctly",
+                sumLRF.makeRequest("importantly"),
+                "//arr[@name='importantly']/str[.='9 200 1352 296 1370']");
+    }
+    
+     
 }
