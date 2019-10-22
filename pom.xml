@@ -6,7 +6,7 @@
 
   <groupId>com.o19s.payloads</groupId>
   <artifactId>solr-payloads</artifactId>
-  <version>1.0.2-solr7.1.0-SNAPSHOT</version>
+  <version>1.0.3-solr7.1.0-SNAPSHOT</version>
 
   <name>solr-payloads</name>
   <url>https://github.com/o19s/payload-component</url>
