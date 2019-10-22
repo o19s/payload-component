@@ -38,7 +38,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Verify payload component functionality",
                 sumLRF.makeRequest("quick"),
-                "//arr[@name='quick']/str[.='testpayload']");
+                "//arr[@name='quick']/lst/str[@name='payload'][.='testpayload']");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Verify Base64 payload is decoded correctly",
                 sumLRF.makeRequest("quick"),
-                "//arr[@name='quick']/str[.='I love payloads!']");
+                "//arr[@name='quick']/lst/str[@name='payload'][.='I love payloads!']");
     }
 
     /**
@@ -108,11 +108,11 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
          */
         assertQ("Verify buffer filter logic",
                 sumLRF.makeRequest("quick stunning amazing small brown fox"),
-                "//arr[@name='quick']/str[.='testpayload']",
-                "//arr[@name='stunning']/str[.='testpayload']",
-                "//arr[@name='amazing']/str[.='second']",
-                "//arr[@name='small']/str[.='second']",
-                "//arr[@name='brown']/str[.='next']",
+                "//arr[@name='quick']/lst/str[@name='payload'][.='testpayload']",
+                "//arr[@name='stunning']/lst/str[@name='payload'][.='testpayload']",
+                "//arr[@name='amazing']/lst/str[@name='payload'][.='second']",
+                "//arr[@name='small']/lst/str[@name='payload'][.='second']",
+                "//arr[@name='brown']/lst/str[@name='payload'][.='next']",
                 "not(//arr[@name='fox'])");
     }
 
@@ -132,9 +132,9 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Testing multiple hits on single token",
                 sumLRF.makeRequest("one"),
-                "//arr[@name='one']/str[.='one']",
-                "//arr[@name='one']/str[.='two']",
-                "//arr[@name='one']/str[.='three']");
+                "(//arr[@name='one']/lst/str[@name='payload'])[1]/self::node()[text() = 'one']",
+                "(//arr[@name='one']/lst/str[@name='payload'])[2]/self::node()[text() = 'two']",
+                "(//arr[@name='one']/lst/str[@name='payload'])[3]/self::node()[text() = 'three']");
     }
 
     @Test
@@ -155,9 +155,30 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Testing multivalued support",
                 sumLRF.makeRequest("one"),
-                "//arr[@name='one']/str[.='one']",
-                "//arr[@name='one']/str[.='two']",
-                "//arr[@name='one']/str[.='three']");
+                "//arr[@name='one']/lst/str[@name='payload'][.='one']",
+                "//arr[@name='one']/lst/str[@name='payload'][.='two']",
+                "//arr[@name='one']/lst/str[@name='payload'][.='three']");
+    }
+
+    @Test
+    public void testOffsets() {
+        // Add a sample doc
+        assertU(adoc("content_payload", "Quick|pl brown fox|pl",
+                "id", "1"));
+        assertU(commit());
+        assertU(optimize());
+
+        HashMap<String,String> args = new HashMap<>();
+        args.put("pl", "true");
+
+        TestHarness.LocalRequestFactory sumLRF = h.getRequestFactory("standard", 0, 200, args);
+
+        assertQ("Verify correct offset values",
+                sumLRF.makeRequest("quick fox"),
+                "//arr[@name='quick']/lst/int[@name='startOffset'][.='0']",
+                "//arr[@name='quick']/lst/int[@name='endOffset'][.='8']",
+                "//arr[@name='fox']/lst/int[@name='startOffset'][.='15']",
+                "//arr[@name='fox']/lst/int[@name='endOffset'][.='21']");
     }
 
     @Test
@@ -175,7 +196,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Verify payload phrase match",
                 sumLRF.makeRequest("\"quick brown\""),
-                "//arr[@name='quick']/str[.='testpayload']");
+                "//arr[@name='quick']/lst/str[@name='payload'][.='testpayload']");
     }
 
     @Test
@@ -193,7 +214,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Verify phrase error doesn't match",
                 sumLRF.makeRequest("brown \"quick fox\""),
-                "not(//arr[@name='quick']/str[.='testpayload'])");
+                "not(//arr[@name='quick']/lst/str[@name='payload'][.='testpayload'])");
     }
 
     @Test
@@ -211,7 +232,7 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Verify phrase tokens don't match outside quote",
                 sumLRF.makeRequest("\"quick brown\""),
-                "not(//arr[@name='quick']/str[.='extra'])");
+                "not(//arr[@name='quick']/lst/str[@name='payload'][.='extra'])");
     }
 
     @Test
@@ -232,8 +253,8 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Verify slop works",
                 sumLRF.makeRequest("\"quick fox\""),
-                "//arr[@name='quick']/str[.='one']",
-                "//arr[@name='fox']/str[.='two']");
+                "//arr[@name='quick']/lst/str[@name='payload'][.='one']",
+                "//arr[@name='fox']/lst/str[@name='payload'][.='two']");
     }
 
     @Test
@@ -252,9 +273,9 @@ public class TestPayloadComponent extends SolrTestCaseJ4 {
 
         assertQ("Testing punctuation cases",
                 sumLRF.makeRequest("apostrophe's period. comma, junk"),
-                "//arr[@name='apostrophe']/str[.='apo']",
-                "//arr[@name='period']/str[.='period']",
-                "//arr[@name='comma']/str[.='comma']",
+                "//arr[@name='apostrophe']/lst/str[@name='payload'][.='apo']",
+                "//arr[@name='period']/lst/str[@name='payload'][.='period']",
+                "//arr[@name='comma']/lst/str[@name='payload'][.='comma']",
                 "not(//arr[@name='junk'])");
     }
     

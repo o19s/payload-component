@@ -2,6 +2,7 @@ package com.o19s.payloads;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.document.Document;
@@ -96,6 +97,7 @@ public class Payloader implements PluginInfoInitialized {
             TokenStream stream = field.getType().getIndexAnalyzer().tokenStream(field.getName(), data);
 
             CharTermAttribute charAtt = stream.addAttribute(CharTermAttribute.class);
+            OffsetAttribute offsetAtt = stream.addAttribute(OffsetAttribute.class);
             PayloadAttribute payloadAtt = stream.addAttribute(PayloadAttribute.class);
             PositionIncrementAttribute posAtt = stream.addAttribute(PositionIncrementAttribute.class);
 
@@ -122,12 +124,19 @@ public class Payloader implements PluginInfoInitialized {
 
                 // Setup the list if it hasn't been added yet
                 if(resp.get(token) == null) {
-                    resp.add(token, new ArrayList<String>());
+                    resp.add(token, new ArrayList<NamedList>());
                 }
 
-                // Add payload to the list for the matching token
-                List<String> payloadList = (List) resp.get(token);
-                payloadList.add(payloadAtt.getPayload().utf8ToString());
+                // Grab reference to the payLoad list for the current token
+                List<NamedList> payloadList = (ArrayList<NamedList>) resp.get(token);
+
+                // Add a new NL entry with the payload/startOffset/endOffset
+                NamedList payloadData = new SimpleOrderedMap();
+                payloadData.add("payload", payloadAtt.getPayload().utf8ToString());
+                payloadData.add("startOffset", offsetAtt.startOffset());
+                payloadData.add("endOffset", offsetAtt.endOffset());
+
+                payloadList.add(payloadData);
             }
             closeStream(stream);
         }
