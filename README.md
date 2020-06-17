@@ -1,5 +1,6 @@
 # payload-component
-This component plugin will return the payloads for terms that matched in your query.
+
+This component plugin will return the payloads for terms that matched in your query. You can see it in action as part of this demonstration project: https://github.com/o19s/pdf-discovery-demo/.
 
 Example document:
 
