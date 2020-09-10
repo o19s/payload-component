@@ -1,0 +1,18 @@
+[
+    {
+      "name": "solr-payloads",
+      "description": "Utilities to retrieve payload information within query results.",
+      "versions": [
+        {
+          "version": "1.1.4",
+          "date": "2020-09-10",
+          "artifacts": [
+            {
+              "url": "https://github.com/o19s/payload-component/releases/download/v1.1.4solr8.6.0/payload-component-v1.1.4solr8.6.0.jar",
+              "sig": "cRZHfyWr6fQyxXnNQGjnuAF8fJCLzgDXh/dWrUuacgMGHSYx2AJxxx747VFSmTbsUebbKURxykKGgy2+bH7aMA=="
+            }
+          ]
+        }
+      ]
+    }
+]
