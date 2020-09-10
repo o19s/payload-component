@@ -11,7 +11,14 @@
               "url": "https://github.com/o19s/payload-component/releases/download/v1.1.4solr8.6.0/payload-component-v1.1.4solr8.6.0.jar",
               "sig": "cRZHfyWr6fQyxXnNQGjnuAF8fJCLzgDXh/dWrUuacgMGHSYx2AJxxx747VFSmTbsUebbKURxykKGgy2+bH7aMA=="
             }
-          ]
+          ],
+	  "manifest": {
+            "version-constraint": "8 - 9",
+            "plugins": [],
+            "parameter-defaults": {
+              "RH-HANDLER-PATH": "/mypath"
+            }
+          }
         }
       ]
     }
