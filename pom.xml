@@ -6,7 +6,7 @@
 
   <groupId>com.o19s.payloads</groupId>
   <artifactId>solr-payloads</artifactId>
-  <version>1.0.3-solr7.1.0-SNAPSHOT</version>
+  <version>1.1.4-solr8.6.0</version>
 
   <name>solr-payloads</name>
   <url>https://github.com/o19s/payload-component</url>
@@ -16,9 +16,8 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <junit.version>4.11</junit.version>
-    <slf4j.version>1.7.7</slf4j.version>
-    <solr.version>7.1.0</solr.version>
+    <junit.version>4.12</junit.version>
+    <solr.version>8.6.0</solr.version>
   </properties>
 
   <dependencies>
@@ -26,12 +25,6 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-test-framework</artifactId>
       <version>${solr.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
