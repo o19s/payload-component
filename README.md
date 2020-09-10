@@ -45,6 +45,15 @@ See it in action at http://github.com/o19s/pdf-discovery-demo.
 - Solr 7.x
 - A field type that utilizes payloads
 
+# Installing as a Solr Package
+To install as a Solr package, first ensure Solr has been started with `-Denable.packages=true` then add the repo:
+
+`bin/solr package add-repo osc https://raw.githubusercontent.com/o19s/payload-component/master/repo`
+
+To install the package run:
+
+`bin/solr package install solr-payloads:1.1.4`
+
 ## Usage
 - Add the payload component to the last-components section of your search handler
 - Configure a field type that utilizes payloads
@@ -57,6 +66,5 @@ Building requires JDK 8 and Maven.  Once you're setup just run:
 `mvn package` to generate the latest jar in the target folder.
 
 ## Todo
-- Support later Solr versions
 - Allow for passing in custom fields to match against
 - Support some basic term statistics in the response
