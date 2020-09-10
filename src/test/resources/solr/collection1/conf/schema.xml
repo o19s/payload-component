@@ -7,6 +7,7 @@
     -->
 
     <field name="id" type="string" indexed="true"  stored="true"  multiValued="false" />
+    <field name="content" type="text" indexed="true"  stored="true"  multiValued="false" termOffsets="true" termPositions="true" termVectors="true" />
     <field name="content_payload" type="payload" indexed="true"  stored="true"  multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
     <field name="content_payload_b64" type="payload_b64" indexed="true" stored="true" multiValued="false" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
     <field name="content_payload_buffered" type="payload_buffered" indexed="true" stored="true" multiValued="true" termPayloads="true" termOffsets="true" termPositions="true" termVectors="true" />
@@ -58,6 +59,18 @@
             <filter class="solr.WordDelimiterFilterFactory" />
             <filter class="solr.LowerCaseFilterFactory" />
             <filter class="com.o19s.payloads.filter.PayloadBufferFilterFactory" />
+        </analyzer>
+    </fieldType>
+
+    <!-- Simple text analysis -->
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
 
