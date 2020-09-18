@@ -64,7 +64,3 @@ To install the package run:
 Building requires JDK 8 and Maven.  Once you're setup just run:
 
 `mvn package` to generate the latest jar in the target folder.
-
-## Todo
-- Allow for passing in custom fields to match against
-- Support some basic term statistics in the response
