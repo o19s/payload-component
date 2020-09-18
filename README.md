@@ -1,6 +1,6 @@
 # payload-component
 
-This component plugin will return the payloads for terms that matched in your query. You can see it in action as part of this demonstration project: https://github.com/o19s/pdf-discovery-demo/.
+This plugin for Solr will return the payloads for terms that matched in your query, and was developed to meet the needs of doing (Keyword in Context Highlighting)[https://en.wikipedia.org/wiki/Key_Word_in_Context] of OCR'ed content. You can see it in action in this demonstration project: https://github.com/o19s/pdf-discovery-demo/.
 
 Example document:
 
@@ -42,7 +42,7 @@ This project was originally conceived as a solution for storing bounding boxes w
 See it in action at http://github.com/o19s/pdf-discovery-demo.
 
 ## Requirements
-- Solr 7.x
+- Solr 8.7
 - A field type that utilizes payloads
 
 # Installing as a Solr Package
@@ -55,7 +55,7 @@ To install the package run:
 `bin/solr package install solr-payloads:1.1.4`
 
 ## Usage
-- Add the payload component to the last-components section of your search handler
+- Add the payload component to the `last-components` section of your search handler
 - Configure a field type that utilizes payloads
 - Pass `pl=on` in your query params for queries in which you want to extract payload matches
 - To learn how to configure you Solr review the test `schema.xml` and `solrconfig.xml` at https://github.com/o19s/payload-component/tree/master/src/test/resources/solr/collection1/conf
