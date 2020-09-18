@@ -1,4 +1,4 @@
-# payload-component
+# Payload Component
 
 This plugin for Solr will return the payloads for terms that matched in your query, and was developed to meet the needs of doing (Keyword in Context Highlighting)[https://en.wikipedia.org/wiki/Key_Word_in_Context] of OCR'ed content. You can see it in action in this demonstration project: https://github.com/o19s/pdf-discovery-demo/.
 
