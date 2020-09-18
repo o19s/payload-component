@@ -73,5 +73,6 @@ Building requires JDK 8 and Maven.  Once you're setup just run:
 
 `mvn package` to generate the latest jar in the target folder.
 
+-------------
 
 __This component was first dreamed up at the [September 2019 Lucene Hackday](https://opensourceconnections.com/blog/2019/09/23/what-happens-at-a-lucene-solr-hackday/).__
