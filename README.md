@@ -54,13 +54,24 @@ To install the package run:
 
 `bin/solr package install solr-payloads:1.1.4`
 
-## Usage
+## Payload Component Usage
 - Add the payload component to the `last-components` section of your search handler
 - Configure a field type that utilizes payloads
 - Pass `pl=on` in your query params for queries in which you want to extract payload matches
 - To learn how to configure you Solr review the test `schema.xml` and `solrconfig.xml` at https://github.com/o19s/payload-component/tree/master/src/test/resources/solr/collection1/conf
 
+## Offset Highlighter Usage
+Frequently we need to do highlighting in OCR offset from a specific location.  This is done in the demonstration project: https://github.com/o19s/pdf-discovery-demo/.
+
+This plugin provides an `OffsetFormatter` which supports pre tags with `$score`, `$numTokens`, `$endOffset`, `$startOffset` placeholders.  If these placeholders are included in the tag they will be replaced with the tokengroup score and offset for the matching text.
+
+Check out the test configuration files for an idea of how to get set up in an actual solr instance.
+
+
 ## Building
 Building requires JDK 8 and Maven.  Once you're setup just run:
 
 `mvn package` to generate the latest jar in the target folder.
+
+
+__This component was first dreamed up at the (September 2019 Lucene Hackday)[https://opensourceconnections.com/blog/2019/09/23/what-happens-at-a-lucene-solr-hackday/].__
