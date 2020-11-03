@@ -21,7 +21,7 @@
  It is *not* a good example to work from.
 -->
 <config>
-  <luceneMatchVersion>8.0</luceneMatchVersion>
+  <luceneMatchVersion>7.1</luceneMatchVersion>
 
 
   <!--  The DirectoryFactory to use for indexes.
@@ -115,7 +115,7 @@
       <!-- Configure the standard formatter -->
       <formatter name="html"
                  default="true"
-                 class="com.o19s.hl.OffsetFormatter">
+                 class="com.o19s.labs.OffsetFormatter">
       </formatter>
 
       <!-- Configure the standard encoder -->
