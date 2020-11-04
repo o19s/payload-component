@@ -25,23 +25,28 @@ public class OffsetIssuesTest extends SolrTestCaseJ4 {
     }
     
     @Test
-    public void testPayloads() throws Exception {
+    public void testIndexingFailsWithCertainDoc() throws Exception {
     	
     	String json = FileUtils.readFileToString(new File("src/test/resources/solr/docs.json"), Charset.defaultCharset());
     	//System.out.println(json);
     	    	
     	updateJ(json( json ),
                 params("commit", "true"));
-  
-
-    	//assertU(adoc((String[])params.toArray()));
-    	
-        // Add a sample doc
-        assertU(adoc("content_payload", "Quick|testpayload brown fox",
-                "id", "1"));
         assertU(commit());
         assertU(optimize());
     }
+    
+    @Test
+    public void testIndexingPassesWithoutCertainDoc() throws Exception {
+    	
+    	String json = FileUtils.readFileToString(new File("src/test/resources/solr/docs-minus-failing-doc.json"), Charset.defaultCharset());
+    	//System.out.println(json);
+    	    	
+    	updateJ(json( json ),
+                params("commit", "true"));
+        assertU(commit());
+        assertU(optimize());
+    }    
 
     @After
     @Override
